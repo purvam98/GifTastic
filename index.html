@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <!-- Latest compiled and minified CSS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+    crossorigin="anonymous">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
+  <title>Animal Buttons</title>
+</head>
+
+<body>
+  <div class="row">
+    <div class="col-sm-12">
+      <!--For Buttons-->
+      <div id="gif-buttons"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <div id="gifs-appear-here">
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+
+      <form id="animal-form">
+        <div class="form-group">
+          <div class="col-sm-12">Enter the animal name</div>
+          </br>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-12">
+            <input type="text" id="new-button" class="form-control">
+          </div>
+          </br>
+        </div>
+        <div class="form-group">
+          </br>
+          <div class="col-sm-12">
+            <input type="submit" class="btn btn-default" id="onsubmit">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var arr = ["cat", "dog", "parrot"];
+    function rbuttons() {
+      $("#gif-buttons").empty();
+      for (var i = 0; i < arr.length; i++) {
+
+        var buttons = $("<button>");
+        buttons.addClass("animal");
+        buttons.addClass("button-class");
+        buttons.addClass("btn btn-primary");
+        buttons.attr("data-animal", arr[i]);
+        buttons.text(arr[i]);
+        $("#gif-buttons").append(buttons);
+        $("</button>")
+
+      }
+    }
+    $("#onsubmit").on("click", function (event) {
+      event.preventDefault();
+      var addb = $("#new-button").val();
+      arr.push(addb);
+      $("#new-button").val('');
+      rbuttons();
+    });
+    rbuttons();
+
+    $(document).on("click", ".animal", function () {
+      var animal = $(this).attr("data-animal");
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        animal + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).then(function (response) {
+        console.log(response);
+        var results = response.data;
+
+        for (var i = 0; i < results.length; i++) {
+
+          var animalDiv = $("<div>");
+          var p = $("<p>");
+          p.text("Rating: " + results[i].rating);
+          var animalImage = $("<img>");
+          animalImage.attr("data-state", "still");
+          animalImage.addClass("gif");
+          animalImage.addClass("fixed-width");
+          animalImage.attr("src", results[i].images.fixed_height_small_still.url);
+          animalDiv.append(p);
+          animalDiv.append(animalImage);
+          animalDiv.addClass("col-sm-4");
+          $("#gifs-appear-here").prepend(animalDiv);
+        }
+
+      });
+    });
+    $(document).on('click', '.gif', function () {
+      var src = $(this).attr("src");
+      if ($(this).hasClass('playing')) {
+        //stop
+        $(this).attr('src', src.replace(/\.gif/i, "_s.gif"))
+        $(this).removeClass('playing');
+      } else {
+        //play
+        $(this).addClass('playing');
+        $(this).attr('src', src.replace(/\_s.gif/i, ".gif"))
+      }
+    });
+  </script>
+</body>
+
+</html>
